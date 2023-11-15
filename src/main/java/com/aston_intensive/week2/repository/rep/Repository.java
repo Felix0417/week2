@@ -11,5 +11,7 @@ public interface Repository<T, K> {
 
     T save(T t) throws SQLException;
 
+    T update(int pos, T t) throws  SQLException;
+
     boolean deleteById(K id);
 }

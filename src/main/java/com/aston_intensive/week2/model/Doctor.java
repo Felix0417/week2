@@ -4,7 +4,7 @@ import java.util.Set;
 
 public class Doctor {
 
-    private long id;
+    private int id;
 
     private String name;
 
@@ -16,18 +16,24 @@ public class Doctor {
     //ManyToMany
     private Set<Patient> patients;
 
-    public Doctor(long id, String name, int salary, Hospital hospital) {
+    public Doctor(int id, String name, int salary, Hospital hospital) {
         this.id = id;
         this.name = name;
         this.salary = salary;
         this.hospital = hospital;
     }
 
-    public long getId() {
+    public Doctor(String name, int salary, Hospital hospital) {
+        this.name = name;
+        this.salary = salary;
+        this.hospital = hospital;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -61,5 +67,16 @@ public class Doctor {
 
     public void setPatients(Set<Patient> patients) {
         this.patients = patients;
+    }
+
+    @Override
+    public String toString() {
+        return "Doctor{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", salary=" + salary +
+                ", hospital=" + hospital +
+                ", patients=" + patients +
+                '}';
     }
 }

@@ -4,17 +4,20 @@ import com.aston_intensive.week2.db.ConnectionManager;
 import com.aston_intensive.week2.model.Hospital;
 import com.aston_intensive.week2.repository.rep.HospitalRepository;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-public class HospitalRepositoryImpl extends AbstractRepositoryImpl implements HospitalRepository {
+public class HospitalRepositoryImpl extends AbstractRepositoryImpl<Hospital> implements HospitalRepository {
 
     private final String FIND_ALL = "SELECT * FROM hospitals";
     private final String FIND_BY_ID = "SELECT * FROM hospitals WHERE id = ?";
 
     private final String INSERT = "INSERT INTO hospitals(name, address) values (?, ?)";
+
+    private final String UPDATE = "UPDATE hospitals SET name = ?, address = ? WHERE id = ?";
 
     private final String DELETE = "DELETE FROM hospitals WHERE hospitals.id = ?";
 
@@ -23,54 +26,29 @@ public class HospitalRepositoryImpl extends AbstractRepositoryImpl implements Ho
     }
 
     @Override
-    public List<Hospital> findAll() throws SQLException {
-        ResultSet resultSet;
-        List<Hospital> hospitalList = new ArrayList<>();
-        try (Connection connection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL)) {
-            resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                hospitalList.add(mapObject(resultSet));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return hospitalList;
+    public List<Hospital> findAll() {
+        return getListResults(FIND_ALL, null);
     }
 
     @Override
     public Hospital findById(Integer id) {
-        try (Connection connection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
-            preparedStatement.setInt(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            Hospital hospital = null;
-            while (resultSet.next()) {
-                hospital = mapObject(resultSet);
-            }
-            return hospital;
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Object Hospital was not found with id - " + id, e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        List<Hospital> list = getListResults(FIND_BY_ID, id);
+        return list.isEmpty() ? null : list.get(0);
     }
 
     @Override
     public Hospital save(Hospital hospital) throws SQLException {
-        return (Hospital) executeUpdate(INSERT, hospital.getName(), hospital.getAddress());
+        return executeUpdate(INSERT, hospital.getName(), hospital.getAddress());
+    }
+
+    @Override
+    public Hospital update(int pos, Hospital hospital) throws SQLException {
+        return executeUpdate(UPDATE, hospital.getName(), hospital.getAddress(), pos);
     }
 
     @Override
     public boolean deleteById(Integer id) {
-        try (Connection connection = connectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(DELETE)) {
-            preparedStatement.setInt(1, id);
-            int i = preparedStatement.executeUpdate();
-            return i > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error while deleting Hospital by id: " + id, e);
-        }
+        return delete(DELETE, id);
     }
 
     protected Hospital mapObject(ResultSet resultSet) throws SQLException {

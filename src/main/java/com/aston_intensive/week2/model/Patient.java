@@ -21,6 +21,12 @@ public class Patient {
         this.address = address;
     }
 
+    public Patient(String name, int age, String address) {
+        this.name = name;
+        this.age = age;
+        this.address = address;
+    }
+
     public long getId() {
         return id;
     }
@@ -59,5 +65,16 @@ public class Patient {
 
     public void setDoctors(Set<Doctor> doctors) {
         this.doctors = doctors;
+    }
+
+    @Override
+    public String toString() {
+        return "Patient{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", address='" + address + '\'' +
+                ", doctors=" + doctors +
+                '}';
     }
 }

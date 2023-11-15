@@ -7,12 +7,11 @@ import com.aston_intensive.week2.repository.rep.PatientRepository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class PatientRepositoryImpl extends AbstractRepositoryImpl implements PatientRepository {
+public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> implements PatientRepository {
 
     private final String FIND_ALL = "SELECT * FROM patients";
     private final String FIND_BY_ID = "SELECT * FROM patients WHERE id = ?";
@@ -21,52 +20,47 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl implements Pat
 
     private final String INSERT = "INSERT INTO patients(name, age, address) values (?, ?, ?)";
 
-    private final String DELETE = "DELETE FROM patients WHERE hospitals.id = ?";
+    private final String UPDATE = "Update patients SET name = ?, age = ?, address = ? WHERE id = ?";
+
+    private final String DELETE = "DELETE FROM patients WHERE id = ?";
 
     public PatientRepositoryImpl(ConnectionManager connectionManager) {
         super(connectionManager);
     }
 
     @Override
-    public List<Patient> findAll() throws SQLException {
-        ResultSet resultSet = getResultSet(FIND_ALL, null);
-        List<Patient> patients = new ArrayList<>();
-        while (resultSet.next()) {
-            patients.add(mapObject(resultSet));
-        }
-        return patients;
+    public List<Patient> findAll() {
+        return getListResults(FIND_ALL, null);
     }
 
     @Override
-    public Patient findById(Integer id) throws SQLException {
-        ResultSet resultSet = getResultSet(FIND_BY_ID, id);
-        if (resultSet.next()) {
-            Patient patient = mapObject(resultSet);
-            patient.setDoctors(getDoctors(resultSet));
-            return patient;
+    public Patient findById(Integer id) {
+        List<Patient> list = getListResults(FIND_BY_ID, id);
+        if (list.isEmpty()){
+            return null;
         }
-        return null;
+        Patient patient = list.get(0);
+        patient.setDoctors(getDoctors(id));
+        return patient;
     }
 
-    public Set<Patient> findAllByDoctorId(Integer doctorId) throws SQLException {
-        Set<Patient> patients = new HashSet<>();
-        ResultSet resultSet = getResultSet(FIND_ALL_DOCTORS_BY_ID, doctorId);
-        while (resultSet.next()) {
-            Patient patient = mapObject(resultSet);
-            patient.setDoctors(getDoctors(resultSet));
-            patients.add(patient);
-        }
-        return patients;
+    public Set<Patient> findAllByDoctorId(Integer doctorId){
+        return new HashSet<>(getListResults(FIND_ALL_DOCTORS_BY_ID, doctorId));
     }
 
     @Override
     public Patient save(Patient patient) throws SQLException {
-        return (Patient) executeUpdate(INSERT, patient.getName(), patient.getAge(), patient.getAddress());
+        return executeUpdate(INSERT, patient.getName(), patient.getAge(), patient.getAddress());
+    }
+
+    @Override
+    public Patient update(int pos, Patient patient) throws SQLException {
+        return executeUpdate(UPDATE, patient.getName(), patient.getAge(), patient.getAddress(), patient.getId());
     }
 
     @Override
     public boolean deleteById(Integer id) {
-        return false;
+        return delete(DELETE, id);
     }
 
     protected Patient mapObject(ResultSet resultSet) throws SQLException {
@@ -77,8 +71,7 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl implements Pat
         return new Patient(id, name, age, address);
     }
 
-    private Set<Doctor> getDoctors(ResultSet resultSet) throws SQLException {
-        int id = resultSet.getInt("id");
-        return new DoctorRepositoryImpl(super.connectionManager).findAllByPatientId(id);
+    private Set<Doctor> getDoctors(int id){
+        return new DoctorRepositoryImpl(connectionManager).findAllByPatientId(id);
     }
 }
