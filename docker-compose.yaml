@@ -1,0 +1,37 @@
+version: '3'
+services:
+  tomcat:
+    image: tomcat
+    container_name: tomcat
+    restart: on-failure
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    environment:
+      JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    volumes:
+      - "/home/felix/IdeaProjects/week2/target:/usr/local/tomcat/webapps"
+    networks:
+      - week2
+
+  database:
+    image: postgres
+    container_name: week2
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: week2
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    networks:
+      - week2
+
+networks:
+  week2:
+    driver: host

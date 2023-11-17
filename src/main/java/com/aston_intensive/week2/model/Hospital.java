@@ -1,5 +1,7 @@
 package com.aston_intensive.week2.model;
 
+import org.mapstruct.Mapping;
+
 import java.time.LocalDateTime;
 
 public class Hospital {
@@ -11,6 +13,9 @@ public class Hospital {
     private String address;
 
     private LocalDateTime estimated;
+
+    public Hospital() {
+    }
 
     public Hospital(int id, String name, String address, LocalDateTime estimated) {
         this.id = id;

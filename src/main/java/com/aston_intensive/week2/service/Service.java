@@ -12,6 +12,6 @@ public interface Service<T> {
 
     T update(int pos, T t) throws SQLException;
 
-    void delete(int id);
+    boolean delete(int id);
 
 }

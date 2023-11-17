@@ -53,11 +53,13 @@ public class PatientServiceImpl implements Service<Patient> {
     }
 
     @Override
-    public void delete(int id) {
+    public boolean delete(int id) {
         if (repository.deleteById(id)) {
             logger.debug("Patient with this id - {} was competently deleted ", id);
+            return true;
         } else {
             logger.debug("Patient with this id - {} was not deleted", id);
+            return false;
         }
     }
 }

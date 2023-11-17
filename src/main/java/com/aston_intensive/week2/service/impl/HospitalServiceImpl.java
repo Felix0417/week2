@@ -21,7 +21,7 @@ public class HospitalServiceImpl implements Service<Hospital> {
     }
 
     @Override
-    public List<Hospital> findAll(){
+    public List<Hospital> findAll() {
         List<Hospital> hospitals = new ArrayList<>();
         try {
             hospitals.addAll(repository.findAll());
@@ -73,11 +73,13 @@ public class HospitalServiceImpl implements Service<Hospital> {
     }
 
     @Override
-    public void delete(int id) {
+    public boolean delete(int id) {
         if (repository.deleteById(id)) {
             logger.debug("Hospital with this id - {} was competently deleted ", id);
+            return true;
         } else {
             logger.debug("Hospital with this id - {} was not deleted", id);
+            return false;
         }
     }
 }

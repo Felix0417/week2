@@ -15,6 +15,7 @@ public class DoctorServiceImpl implements Service<Doctor> {
     private final DoctorRepositoryImpl repository;
 
     private static final Logger logger = LoggerFactory.getLogger(DoctorServiceImpl.class);
+
     public DoctorServiceImpl(DoctorRepositoryImpl repository) {
         this.repository = repository;
     }
@@ -53,11 +54,13 @@ public class DoctorServiceImpl implements Service<Doctor> {
     }
 
     @Override
-    public void delete(int id) {
+    public boolean delete(int id) {
         if (repository.deleteById(id)) {
             logger.debug("Doctor with this id - {} was competently deleted ", id);
+            return true;
         } else {
             logger.debug("Doctor with this id - {} was not deleted", id);
+            return false;
         }
     }
 }
