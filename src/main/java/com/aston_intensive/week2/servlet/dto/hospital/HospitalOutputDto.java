@@ -1,11 +1,11 @@
 package com.aston_intensive.week2.servlet.dto.hospital;
 
 public class HospitalOutputDto {
-    private int id;
+    private final int id;
 
-    private String name;
+    private final String name;
 
-    private String address;
+    private final String address;
 
     public HospitalOutputDto(int id, String name, String address) {
         this.id = id;

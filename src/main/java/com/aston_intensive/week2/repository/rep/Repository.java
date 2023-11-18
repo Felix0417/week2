@@ -7,11 +7,11 @@ public interface Repository<T, K> {
 
     List<T> findAll() throws SQLException;
 
-    T findById(K id)throws SQLException;
+    T findById(K id) throws SQLException;
 
     T save(T t) throws SQLException;
 
-    T update(int pos, T t) throws  SQLException;
+    T update(int pos, T t) throws SQLException;
 
     boolean deleteById(K id);
 }

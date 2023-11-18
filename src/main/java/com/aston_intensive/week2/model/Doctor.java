@@ -16,6 +16,9 @@ public class Doctor {
     //ManyToMany
     private Set<Patient> patients;
 
+    public Doctor() {
+    }
+
     public Doctor(int id, String name, int salary, Hospital hospital) {
         this.id = id;
         this.name = name;

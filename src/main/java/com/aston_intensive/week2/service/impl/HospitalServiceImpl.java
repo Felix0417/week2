@@ -14,6 +14,7 @@ import java.util.List;
 public class HospitalServiceImpl implements Service<Hospital> {
 
     private final HospitalRepository repository;
+
     private static final Logger logger = LoggerFactory.getLogger(HospitalServiceImpl.class);
 
     public HospitalServiceImpl(HospitalRepository repository) {
@@ -39,6 +40,7 @@ public class HospitalServiceImpl implements Service<Hospital> {
             hospital = repository.findById(id);
         } catch (SQLException e) {
             logger.error("Wrong sql query", e);
+            return null;
         }
         logger.debug("Get Hospital with id - {}", id);
         return hospital;

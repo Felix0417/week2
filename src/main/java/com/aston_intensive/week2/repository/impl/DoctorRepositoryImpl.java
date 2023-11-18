@@ -23,7 +23,7 @@ public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> impleme
 
     private final String INSERT = "INSERT INTO doctors(name, salary, hospital_id) values (?, ?, ?)";
 
-    private final  String UPDATE = "UPDATE doctors SET name = ?, salary = ?, hospital_id = ? WHERE id = ?";
+    private final String UPDATE = "UPDATE doctors SET name = ?, salary = ?, hospital_id = ? WHERE id = ?";
 
     private final String DELETE = "DELETE FROM doctors WHERE id = ?";
 
@@ -34,10 +34,6 @@ public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> impleme
     @Override
     public List<Doctor> findAll() throws SQLException {
         return getListResults(FIND_ALL, null);
-    }
-
-    public List<Doctor> findAllByHospitalId(int hospitalId) {
-        return getListResults(FIND_ALL_BY_HOSPITAL_ID, hospitalId);
     }
 
     @Override
@@ -80,7 +76,7 @@ public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> impleme
     }
 
 
-    private Set<Patient> getPatients(int id) throws SQLException {
+    private Set<Patient> getPatients(int id) {
         return new PatientRepositoryImpl(connectionManager).findAllByDoctorId(id);
     }
 }

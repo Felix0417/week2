@@ -22,7 +22,7 @@ public abstract class AbstractRepositoryImpl<T> {
             }
             ResultSet resultSet = preparedStatement.executeQuery();
             List<T> list = new ArrayList<>();
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 list.add(mapObject(resultSet));
             }
             return list;
@@ -51,7 +51,7 @@ public abstract class AbstractRepositoryImpl<T> {
         }
     }
 
-    protected boolean delete(String query, int id){
+    protected boolean delete(String query, int id) {
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, id);

@@ -20,36 +20,55 @@ public class DoctorServiceImpl implements Service<Doctor> {
         this.repository = repository;
     }
 
-
     @Override
-    public List<Doctor> findAll() throws SQLException {
-        List<Doctor> doctors = new ArrayList<>(repository.findAll());
+    public List<Doctor> findAll() {
+        List<Doctor> doctors = new ArrayList<>();
+        try {
+            doctors.addAll(repository.findAll());
+        } catch (SQLException e) {
+            logger.error("Wrong sql query", e);
+        }
         logger.debug("Get All Doctors");
         return doctors;
     }
 
     @Override
-    public Doctor findById(int id) throws SQLException {
-        Doctor doctor = repository.findById(id);
+    public Doctor findById(int id) {
+        Doctor doctor = null;
+        try {
+            doctor = repository.findById(id);
+        } catch (SQLException e) {
+            logger.error("Wrong sql query", e);
+        }
         logger.debug("Get Doctor with id - {}", id);
         return doctor;
     }
 
     @Override
-    public Doctor save(Doctor doctor) throws SQLException {
-        Doctor newDoctor = repository.save(doctor);
-        logger.debug("Save new Hospital with parameters - {}", newDoctor);
+    public Doctor save(Doctor doctor) {
+        Doctor newDoctor = null;
+        try {
+            newDoctor = repository.save(doctor);
+        } catch (SQLException e) {
+            logger.error("Exception in save method", e);
+        }
+        logger.debug("Save new Doctor with parameters - {}", newDoctor);
         return newDoctor;
     }
 
     @Override
-    public Doctor update(int pos, Doctor doctor) throws SQLException {
+    public Doctor update(int pos, Doctor doctor) {
         if (findById(pos) == null) {
-            logger.debug("Doctor with this id - {} was not found", pos);
+            logger.debug("Doctor with id - {} was not found", pos);
             return null;
         }
-        Doctor updateDoctor = repository.update(pos, doctor);
-        logger.debug("Hospital with this id - {} was updated", updateDoctor.getId());
+        Doctor updateDoctor = null;
+        try {
+            updateDoctor = repository.update(pos, doctor);
+        } catch (SQLException e) {
+            logger.error("Exception in save method", e);
+        }
+        logger.debug("Doctor with id - {} was updated", pos);
         return updateDoctor;
     }
 

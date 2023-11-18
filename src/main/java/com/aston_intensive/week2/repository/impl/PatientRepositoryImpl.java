@@ -29,14 +29,14 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
     }
 
     @Override
-    public List<Patient> findAll() {
+    public List<Patient> findAll() throws SQLException {
         return getListResults(FIND_ALL, null);
     }
 
     @Override
-    public Patient findById(Integer id) {
+    public Patient findById(Integer id) throws SQLException {
         List<Patient> list = getListResults(FIND_BY_ID, id);
-        if (list.isEmpty()){
+        if (list.isEmpty()) {
             return null;
         }
         Patient patient = list.get(0);
@@ -44,7 +44,7 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
         return patient;
     }
 
-    public Set<Patient> findAllByDoctorId(Integer doctorId){
+    public Set<Patient> findAllByDoctorId(Integer doctorId) {
         return new HashSet<>(getListResults(FIND_ALL_DOCTORS_BY_ID, doctorId));
     }
 
@@ -55,7 +55,7 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
 
     @Override
     public Patient update(int pos, Patient patient) throws SQLException {
-        return executeUpdate(UPDATE, patient.getName(), patient.getAge(), patient.getAddress(), patient.getId());
+        return executeUpdate(UPDATE, patient.getName(), patient.getAge(), patient.getAddress(), pos);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
         return new Patient(id, name, age, address);
     }
 
-    private Set<Doctor> getDoctors(int id){
+    private Set<Doctor> getDoctors(int id) {
         return new DoctorRepositoryImpl(connectionManager).findAllByPatientId(id);
     }
 }
