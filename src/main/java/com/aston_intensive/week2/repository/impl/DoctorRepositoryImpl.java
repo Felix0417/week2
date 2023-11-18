@@ -15,9 +15,8 @@ import java.util.Set;
 public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> implements DoctorRepository {
 
     private final String FIND_ALL = "SELECT * FROM doctors";
-    private final String FIND_BY_ID = "SELECT * FROM doctors WHERE id = ?";
 
-    private final String FIND_ALL_BY_HOSPITAL_ID = "SELECT * FROM doctors WHERE hospital_id = ?";
+    private final String FIND_BY_ID = "SELECT * FROM doctors WHERE id = ?";
 
     private final String FIND_ALL_BY_PATIENT_ID = "SELECT d.* FROM doctors d INNER JOIN doctor_patient dp on d.id = dp.doctor_id WHERE patient_id = ?";
 
@@ -32,12 +31,12 @@ public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> impleme
     }
 
     @Override
-    public List<Doctor> findAll() throws SQLException {
+    public List<Doctor> findAll() {
         return getListResults(FIND_ALL, null);
     }
 
     @Override
-    public Doctor findById(Integer id) throws SQLException {
+    public Doctor findById(Integer id) {
         List<Doctor> doctors = getListResults(FIND_BY_ID, id);
         if (doctors.isEmpty()) {
             return null;
@@ -48,13 +47,23 @@ public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> impleme
     }
 
     @Override
-    public Doctor save(Doctor doctor) throws SQLException {
-        return executeUpdate(INSERT, doctor.getName(), doctor.getSalary(), doctor.getHospital().getId());
+    public Doctor save(Doctor doctor) {
+        try {
+            return executeUpdate(INSERT, doctor.getName(), doctor.getSalary(), doctor.getHospital().getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
-    public Doctor update(int pos, Doctor doctor) throws SQLException {
-        return executeUpdate(UPDATE, doctor.getName(), doctor.getSalary(), doctor.getHospital().getId(), pos);
+    public Doctor update(int pos, Doctor doctor) {
+        try {
+            return executeUpdate(UPDATE, doctor.getName(), doctor.getSalary(), doctor.getHospital().getId(), pos);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -66,15 +75,19 @@ public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> impleme
         return new HashSet<>(getListResults(FIND_ALL_BY_PATIENT_ID, patientId));
     }
 
-    protected Doctor mapObject(ResultSet resultSet) throws SQLException {
-        int id = resultSet.getInt("id");
-        String name = resultSet.getString("name");
-        int salary = resultSet.getInt("salary");
-        int hospitalId = resultSet.getInt("hospital_id");
-        Hospital hospital = new HospitalRepositoryImpl(connectionManager).findById(hospitalId);
-        return new Doctor(id, name, salary, hospital);
+    protected Doctor mapObject(ResultSet resultSet) {
+        try {
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            int salary = resultSet.getInt("salary");
+            int hospitalId = resultSet.getInt("hospital_id");
+            Hospital hospital = new HospitalRepositoryImpl(connectionManager).findById(hospitalId);
+            return new Doctor(id, name, salary, hospital);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
-
 
     private Set<Patient> getPatients(int id) {
         return new PatientRepositoryImpl(connectionManager).findAllByDoctorId(id);

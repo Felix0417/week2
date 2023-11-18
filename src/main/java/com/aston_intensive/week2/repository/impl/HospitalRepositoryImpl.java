@@ -37,13 +37,23 @@ public class HospitalRepositoryImpl extends AbstractRepositoryImpl<Hospital> imp
     }
 
     @Override
-    public Hospital save(Hospital hospital) throws SQLException {
-        return executeUpdate(INSERT, hospital.getName(), hospital.getAddress());
+    public Hospital save(Hospital hospital) {
+        try {
+            return executeUpdate(INSERT, hospital.getName(), hospital.getAddress());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
-    public Hospital update(int pos, Hospital hospital) throws SQLException {
-        return executeUpdate(UPDATE, hospital.getName(), hospital.getAddress(), pos);
+    public Hospital update(int pos, Hospital hospital) {
+        try {
+            return executeUpdate(UPDATE, hospital.getName(), hospital.getAddress(), pos);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -51,15 +61,17 @@ public class HospitalRepositoryImpl extends AbstractRepositoryImpl<Hospital> imp
         return delete(DELETE, id);
     }
 
-    protected Hospital mapObject(ResultSet resultSet) throws SQLException {
-        if (resultSet != null) {
+    protected Hospital mapObject(ResultSet resultSet) {
+        try {
             int id = resultSet.getInt("id");
             String name = resultSet.getString("name");
             String address = resultSet.getString("address");
             Timestamp timestamp = resultSet.getTimestamp("estimated");
             LocalDateTime estimated = timestamp.toLocalDateTime();
-
             return new Hospital(id, name, address, estimated);
-        } else return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

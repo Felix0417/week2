@@ -29,12 +29,12 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
     }
 
     @Override
-    public List<Patient> findAll() throws SQLException {
+    public List<Patient> findAll() {
         return getListResults(FIND_ALL, null);
     }
 
     @Override
-    public Patient findById(Integer id) throws SQLException {
+    public Patient findById(Integer id) {
         List<Patient> list = getListResults(FIND_BY_ID, id);
         if (list.isEmpty()) {
             return null;
@@ -49,13 +49,23 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
     }
 
     @Override
-    public Patient save(Patient patient) throws SQLException {
-        return executeUpdate(INSERT, patient.getName(), patient.getAge(), patient.getAddress());
+    public Patient save(Patient patient) {
+        try {
+            return executeUpdate(INSERT, patient.getName(), patient.getAge(), patient.getAddress());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
-    public Patient update(int pos, Patient patient) throws SQLException {
-        return executeUpdate(UPDATE, patient.getName(), patient.getAge(), patient.getAddress(), pos);
+    public Patient update(int pos, Patient patient) {
+        try {
+            return executeUpdate(UPDATE, patient.getName(), patient.getAge(), patient.getAddress(), pos);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -63,12 +73,17 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
         return delete(DELETE, id);
     }
 
-    protected Patient mapObject(ResultSet resultSet) throws SQLException {
-        int id = resultSet.getInt("id");
-        String name = resultSet.getString("name");
-        int age = resultSet.getInt("age");
-        String address = resultSet.getString("address");
-        return new Patient(id, name, age, address);
+    protected Patient mapObject(ResultSet resultSet) {
+        try {
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            int age = resultSet.getInt("age");
+            String address = resultSet.getString("address");
+            return new Patient(id, name, age, address);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private Set<Doctor> getDoctors(int id) {

@@ -6,7 +6,6 @@ import com.aston_intensive.week2.service.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,37 +22,21 @@ public class HospitalServiceImpl implements Service<Hospital> {
 
     @Override
     public List<Hospital> findAll() {
-        List<Hospital> hospitals = new ArrayList<>();
-        try {
-            hospitals.addAll(repository.findAll());
-        } catch (SQLException e) {
-            logger.error("Wrong sql query", e);
-        }
+        List<Hospital> hospitals = new ArrayList<>(repository.findAll());
         logger.debug("Get All Hospitals");
         return hospitals;
     }
 
     @Override
     public Hospital findById(int id) {
-        Hospital hospital = null;
-        try {
-            hospital = repository.findById(id);
-        } catch (SQLException e) {
-            logger.error("Wrong sql query", e);
-            return null;
-        }
+        Hospital hospital = repository.findById(id);
         logger.debug("Get Hospital with id - {}", id);
         return hospital;
     }
 
     @Override
     public Hospital save(Hospital hospital) {
-        Hospital newHospital = null;
-        try {
-            newHospital = repository.save(hospital);
-        } catch (SQLException e) {
-            logger.error("Exception in save method", e);
-        }
+        Hospital newHospital = repository.save(hospital);
         logger.debug("Save new Hospital with parameters - {}", newHospital);
         return newHospital;
     }
@@ -64,12 +47,7 @@ public class HospitalServiceImpl implements Service<Hospital> {
             logger.debug("Hospital with this id - {} was not found", pos);
             return null;
         }
-        Hospital updateHospital = null;
-        try {
-            updateHospital = repository.update(pos, hospital);
-        } catch (SQLException e) {
-            logger.error("Exception in save method", e);
-        }
+        Hospital updateHospital = repository.update(pos, hospital);
         logger.debug("Hospital with this id - {} was updated", pos);
         return updateHospital;
     }

@@ -6,7 +6,6 @@ import com.aston_intensive.week2.service.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,36 +21,21 @@ public class PatientServiceImpl implements Service<Patient> {
 
     @Override
     public List<Patient> findAll() {
-        List<Patient> patients = new ArrayList<>();
-        try {
-            patients.addAll(repository.findAll());
-        } catch (SQLException e) {
-            logger.error("Wrong sql query", e);
-        }
+        List<Patient> patients = new ArrayList<>(repository.findAll());
         logger.debug("Get All Patients");
         return patients;
     }
 
     @Override
     public Patient findById(int id) {
-        Patient patient = null;
-        try {
-            patient = repository.findById(id);
-        } catch (SQLException e) {
-            logger.error("Wrong sql query", e);
-        }
+        Patient patient = repository.findById(id);
         logger.debug("Get Patient with id - {}", id);
         return patient;
     }
 
     @Override
     public Patient save(Patient patient) {
-        Patient newPatient = null;
-        try {
-            newPatient = repository.save(patient);
-        } catch (SQLException e) {
-            logger.error("Exception in save method", e);
-        }
+        Patient newPatient = repository.save(patient);
         logger.debug("Save new Patient with parameters - {}", newPatient);
         return newPatient;
     }
@@ -62,12 +46,7 @@ public class PatientServiceImpl implements Service<Patient> {
             logger.debug("Patient with this id - {} was not found", pos);
             return null;
         }
-        Patient updatePatient = null;
-        try {
-            updatePatient = repository.update(pos, patient);
-        } catch (SQLException e) {
-            logger.error("Exception in save method", e);
-        }
+        Patient updatePatient = repository.update(pos, patient);
         logger.debug("Hospital with this id - {} was updated", pos);
         return updatePatient;
     }
