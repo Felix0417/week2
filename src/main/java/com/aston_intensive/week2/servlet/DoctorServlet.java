@@ -23,7 +23,7 @@ import java.io.IOException;
 @WebServlet(name = "DoctorServlet", urlPatterns = {"/doctors", "/doctors/*"})
 public class DoctorServlet extends AbstractServlet<Doctor, DoctorInputDto, DoctorOutputDto> {
 
-    private transient HospitalServiceImpl hospitalService;
+    protected transient HospitalServiceImpl hospitalService;
 
     @Override
     protected Service<Doctor> getService(ConnectionManager connectionManager) {
@@ -49,7 +49,6 @@ public class DoctorServlet extends AbstractServlet<Doctor, DoctorInputDto, Docto
         hospitalService = new HospitalServiceImpl(new HospitalRepositoryImpl(connectionManager));
     }
 
-
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
@@ -58,6 +57,8 @@ public class DoctorServlet extends AbstractServlet<Doctor, DoctorInputDto, Docto
                 Doctor doctor = getDoctorWithHospital(req);
                 if (service.save(doctor) == null) {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                }else {
+                    resp.setStatus(HttpServletResponse.SC_CREATED);
                 }
             } catch (IOException | NullPointerException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -75,6 +76,8 @@ public class DoctorServlet extends AbstractServlet<Doctor, DoctorInputDto, Docto
                 Doctor doctor = getDoctorWithHospital(req);
                 if (service.update(pos, doctor) == null) {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 }
             } catch (IOException | NullPointerException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -82,7 +85,7 @@ public class DoctorServlet extends AbstractServlet<Doctor, DoctorInputDto, Docto
         } else resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
     }
 
-    private Doctor getDoctorWithHospital(HttpServletRequest req) throws IOException {
+    protected Doctor getDoctorWithHospital(HttpServletRequest req) throws IOException {
         DoctorInputDto doctorInputDto = mapToDto(req);
         Hospital hospital = hospitalService.findById(doctorInputDto.getHospitalId());
         if (hospital == null) {

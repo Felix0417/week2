@@ -67,7 +67,7 @@ public class HospitalRepositoryImpl extends AbstractRepositoryImpl<Hospital> imp
             String name = resultSet.getString("name");
             String address = resultSet.getString("address");
             Timestamp timestamp = resultSet.getTimestamp("estimated");
-            LocalDateTime estimated = timestamp.toLocalDateTime();
+            LocalDateTime estimated = timestamp == null ? null : timestamp.toLocalDateTime();
             return new Hospital(id, name, address, estimated);
         } catch (SQLException e) {
             e.printStackTrace();

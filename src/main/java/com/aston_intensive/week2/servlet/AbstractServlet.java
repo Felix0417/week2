@@ -64,6 +64,8 @@ public abstract class AbstractServlet<T, D, O> extends HttpServlet {
                 T entity = getMapper().mapToObj(inputDto);
                 if (service.save(entity) == null) {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                }else {
+                    resp.setStatus(HttpServletResponse.SC_CREATED);
                 }
             } catch (Exception e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -73,15 +75,17 @@ public abstract class AbstractServlet<T, D, O> extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
         String[] paths = req.getPathInfo().split("/");
         if (paths.length == 2) {
             try {
                 int pos = Integer.parseInt(paths[1]);
                 D inputDto = mapToDto(req);
                 T entity = getMapper().mapToObj(inputDto);
-                if (service.update(pos, entity) == null) {
+                T updated = service.update(pos, entity);
+                if (updated == null) {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                }else {
+                    resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 }
             } catch (NumberFormatException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -97,6 +101,8 @@ public abstract class AbstractServlet<T, D, O> extends HttpServlet {
                 int pos = Integer.parseInt(paths[1]);
                 if (!service.delete(pos)) {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                }else {
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 }
             } catch (NumberFormatException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -104,7 +110,7 @@ public abstract class AbstractServlet<T, D, O> extends HttpServlet {
         } else resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
     }
 
-    private String convert(Object obj) throws JsonProcessingException {
+    protected String convert(Object obj) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         return mapper.writeValueAsString(obj);

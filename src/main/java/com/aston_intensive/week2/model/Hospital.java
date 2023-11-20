@@ -1,7 +1,5 @@
 package com.aston_intensive.week2.model;
 
-import org.mapstruct.Mapping;
-
 import java.time.LocalDateTime;
 
 public class Hospital {
