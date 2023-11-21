@@ -29,14 +29,23 @@ public class DoctorServiceImpl implements Service<Doctor> {
     @Override
     public Doctor findById(int id) {
         Doctor doctor = repository.findById(id);
-        logger.debug("Get Doctor with id - {}", id);
+        if (doctor != null) {
+            logger.debug("Get Doctor with id - {}", id);
+        } else {
+            logger.debug("Doctor with id - {} was not found", id);
+        }
         return doctor;
     }
 
     @Override
     public Doctor save(Doctor doctor) {
         Doctor newDoctor = repository.save(doctor);
-        logger.debug("Save new Doctor with parameters - {}", newDoctor);
+        if (newDoctor != null) {
+            logger.debug("Save new Doctor with parameters - {}", newDoctor);
+        } else {
+            logger.debug("Doctor was not saved with this parameters - {}", doctor);
+        }
+
         return newDoctor;
     }
 
@@ -47,7 +56,11 @@ public class DoctorServiceImpl implements Service<Doctor> {
             return null;
         }
         Doctor updateDoctor = repository.update(pos, doctor);
-        logger.debug("Doctor with id - {} was updated", pos);
+        if (updateDoctor != null) {
+            logger.debug("Doctor with id - {} was updated", pos);
+        } else {
+            logger.debug("Doctor with id - {} was not updated", pos);
+        }
         return updateDoctor;
     }
 

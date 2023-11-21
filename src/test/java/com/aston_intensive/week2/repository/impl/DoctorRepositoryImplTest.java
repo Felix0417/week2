@@ -1,63 +1,81 @@
 package com.aston_intensive.week2.repository.impl;
 
-import com.aston_intensive.week2.db.ConnectionManager;
+import com.aston_intensive.week2.PostgreSQLContainersTest;
+import com.aston_intensive.week2.TestConnectionManager;
 import com.aston_intensive.week2.model.Doctor;
-import com.aston_intensive.week2.model.Hospital;
-import com.aston_intensive.week2.model.Patient;
+import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.junit.runners.MethodSorters;
 
-import javax.print.Doc;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.Collections;
+import java.sql.Statement;
 import java.util.List;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+class DoctorRepositoryImplTest extends PostgreSQLContainersTest {
 
-class DoctorRepositoryImplTest {
+    private DoctorRepositoryImpl doctorRepository;
 
     @BeforeEach
     void setUp() {
-
-    }
-
-
-    @Test
-    void findAll() {
+        doctorRepository = new DoctorRepositoryImpl(new TestConnectionManager());
     }
 
     @Test
-    void findById() throws SQLException {
+    void getListResults() {
+        List<Doctor> list = doctorRepository.findAll();
 
+        assertEquals(6, list.size());
     }
 
     @Test
-    void save() {
+    void executeUpdate() {
+        Doctor doctor = doctorRepository.findById(2);
+        doctor.setName("Vasya");
+        doctorRepository.update(2, doctor);
+
+        assertEquals(doctor.getName(), doctorRepository.findById(2).getName());
     }
 
     @Test
-    void update() {
+    void delete() {
+        assertTrue(doctorRepository.deleteById(3));
     }
 
     @Test
-    void deleteById() {
+    void mapObject() throws SQLException {
+        Doctor doctor = doctorRepository.findById(2);
+        String query = "UPDATE doctors SET name = ?, salary = ? WHERE id = ?";
+        PreparedStatement statement = doctorRepository.connectionManager.getConnection()
+                .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        statement.setObject(1, doctor.getName());
+        statement.setObject(2, doctor.getSalary());
+        statement.setObject(3, doctor.getId());
+
+
+        statement.executeUpdate();
+        ResultSet resultSet = statement.getGeneratedKeys();
+        resultSet.next();
+
+        Doctor doctor1 = doctorRepository.mapObject(resultSet);
+
+        assertEquals(doctor.getName(), doctor1.getName());
+        assertEquals(doctor.getId(), doctor1.getId());
     }
 
     @Test
     void findAllByPatientId() {
+        assertEquals(1, doctorRepository.findAllByPatientId(1).size());
     }
 
     @Test
-    void mapObject() {
+    void getPatients() {
+        assertEquals(1, doctorRepository.getPatients(1).size());
     }
 }

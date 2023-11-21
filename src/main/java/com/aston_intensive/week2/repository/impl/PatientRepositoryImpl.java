@@ -86,7 +86,7 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
         }
     }
 
-    private Set<Doctor> getDoctors(int id) {
+    protected Set<Doctor> getDoctors(int id) {
         return new DoctorRepositoryImpl(connectionManager).findAllByPatientId(id);
     }
 }

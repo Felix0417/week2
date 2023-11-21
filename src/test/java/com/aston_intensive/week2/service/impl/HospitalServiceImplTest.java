@@ -4,6 +4,7 @@ import com.aston_intensive.week2.model.Hospital;
 import com.aston_intensive.week2.repository.impl.HospitalRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -16,6 +17,9 @@ import static org.mockito.Mockito.*;
 
 class HospitalServiceImplTest {
 
+    @InjectMocks
+    private HospitalServiceImpl service;
+
     @Mock
     private HospitalRepositoryImpl repository;
 
@@ -25,7 +29,66 @@ class HospitalServiceImplTest {
     }
 
     @Test
-    void findAll() {
+    void service_findAll() {
+        List<Hospital> hospitals = Arrays.asList(
+                new Hospital(1, "Hospital 1", "address 1", LocalDateTime.now()),
+                new Hospital(2, "Hospital 2", "address 2", LocalDateTime.now())
+        );
+
+        when(service.findAll()).thenReturn(hospitals);
+        assertEquals(hospitals, service.findAll());
+    }
+
+    @Test
+    void service_findById() {
+        Hospital hospital = new Hospital(1, "Hospital 1", "address 1", LocalDateTime.now());
+
+        when(service.findById(1)).thenReturn(hospital);
+        when(service.findById(2)).thenReturn(null);
+
+        assertEquals(hospital, service.findById(1));
+        assertNull(service.findById(2));
+    }
+
+    @Test
+    void service_save() {
+        Hospital hospital = new Hospital(1, "Hospital 1", "address 1", LocalDateTime.now());
+        Hospital savedHospital = new Hospital("Hospital 1", "address 1");
+
+        when(service.save(hospital)).thenReturn(savedHospital);
+        when(service.save(null)).thenReturn(null);
+
+        assertEquals(savedHospital, service.save(hospital));
+        assertNull(service.save(null));
+    }
+
+    @Test
+    void service_update() {
+        Hospital hospital = new Hospital(1, "Hospital 1", "address 1", LocalDateTime.now());
+        Hospital updatedHospital = new Hospital("Hospital 1", "address 1");
+
+        when(service.findById(1)).thenReturn(hospital);
+        when(service.findById(2)).thenReturn(null);
+        when(service.findById(2)).thenReturn(hospital);
+        when(service.update(1, hospital)).thenReturn(updatedHospital);
+        when(service.update(3, null)).thenReturn(null);
+
+        assertEquals(updatedHospital, service.update(1, hospital));
+        assertNull(service.update(2, hospital));
+        assertNull(service.update(3, null));
+    }
+
+    @Test
+    void service_delete() {
+        when(service.delete(1)).thenReturn(true);
+        when(service.delete(2)).thenReturn(false);
+
+        assertTrue(service.delete(1));
+        assertFalse(service.delete(2));
+    }
+
+    @Test
+    void repository_findAll() {
         List<Hospital> hospitals = Arrays.asList(
                 new Hospital(1, "Hospital 1", "address 1", LocalDateTime.now()),
                 new Hospital(2, "Hospital 2", "address 2", LocalDateTime.now())
@@ -37,7 +100,7 @@ class HospitalServiceImplTest {
     }
 
     @Test
-    void findById() {
+    void repository_findById() {
         Hospital hospital = new Hospital(1, "Hospital 1", "address 1", LocalDateTime.now());
         when(repository.findById(1)).thenReturn(hospital);
         when(repository.findById(2)).thenReturn(null);
@@ -47,7 +110,7 @@ class HospitalServiceImplTest {
     }
 
     @Test
-    void save() {
+    void repository_save() {
         Hospital hospital = new Hospital(1, "Hospital 1", "address 1", LocalDateTime.now());
         Hospital forSave = new Hospital("Hospital 1", "address 1");
         when(repository.save(forSave)).thenReturn(hospital);
@@ -56,7 +119,7 @@ class HospitalServiceImplTest {
     }
 
     @Test
-    void update() {
+    void repository_update() {
         Hospital hospital = new Hospital(1, "Hospital 1", "address 1", LocalDateTime.now());
         Hospital forUpdate = new Hospital("Hospital 1", "address 1");
         when(repository.update(1, forUpdate)).thenReturn(hospital);
@@ -67,7 +130,7 @@ class HospitalServiceImplTest {
     }
 
     @Test
-    void delete() {
+    void repository_delete() {
         when(repository.deleteById(1)).thenReturn(true);
         when(repository.deleteById(2)).thenReturn(false);
         assertTrue(repository.deleteById(1));

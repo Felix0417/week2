@@ -9,9 +9,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 class PatientMapperTest {
@@ -46,6 +48,7 @@ class PatientMapperTest {
 
         when(mapper.mapAllFromObj(patients)).thenReturn(dtoList);
         assertEquals(dtoList, mapper.mapAllFromObj(patients));
+        assertEquals(Collections.emptyList(), mapper.mapAllFromObj(null));
     }
 
     @Test
@@ -55,6 +58,7 @@ class PatientMapperTest {
 
         when(mapper.mapFromObj(patient)).thenReturn(outputDto);
         assertEquals(outputDto, mapper.mapFromObj(patient));
+        assertNull(mapper.mapFromObj(null));
     }
 
     @Test
@@ -64,6 +68,6 @@ class PatientMapperTest {
 
         when(mapper.mapToObj(inputDto)).thenReturn(patient);
         assertEquals(patient, mapper.mapToObj(inputDto));
-
+        assertNull(mapper.mapToObj(null));
     }
 }

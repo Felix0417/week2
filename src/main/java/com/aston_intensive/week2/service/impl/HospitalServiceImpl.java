@@ -30,14 +30,22 @@ public class HospitalServiceImpl implements Service<Hospital> {
     @Override
     public Hospital findById(int id) {
         Hospital hospital = repository.findById(id);
-        logger.debug("Get Hospital with id - {}", id);
+        if (hospital != null) {
+            logger.debug("Get Hospital with id - {}", id);
+        } else {
+            logger.debug("Hospital with id - {} was not found", id);
+        }
         return hospital;
     }
 
     @Override
     public Hospital save(Hospital hospital) {
         Hospital newHospital = repository.save(hospital);
-        logger.debug("Save new Hospital with parameters - {}", newHospital);
+        if (hospital != null) {
+            logger.debug("Save new Hospital with parameters - {}", newHospital);
+        } else {
+            logger.debug("Hospital with parameters - {} was not saved", newHospital);
+        }
         return newHospital;
     }
 
@@ -48,7 +56,11 @@ public class HospitalServiceImpl implements Service<Hospital> {
             return null;
         }
         Hospital updateHospital = repository.update(pos, hospital);
-        logger.debug("Hospital with this id - {} was updated", pos);
+        if (updateHospital != null) {
+            logger.debug("Hospital with this id - {} was updated", pos);
+        } else {
+            logger.debug("Hospital with this id - {} was not updated", pos);
+        }
         return updateHospital;
     }
 

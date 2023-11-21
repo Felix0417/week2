@@ -89,7 +89,7 @@ public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> impleme
         }
     }
 
-    private Set<Patient> getPatients(int id) {
+    protected Set<Patient> getPatients(int id) {
         return new PatientRepositoryImpl(connectionManager).findAllByDoctorId(id);
     }
 }

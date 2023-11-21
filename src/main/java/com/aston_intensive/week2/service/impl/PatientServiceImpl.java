@@ -29,14 +29,22 @@ public class PatientServiceImpl implements Service<Patient> {
     @Override
     public Patient findById(int id) {
         Patient patient = repository.findById(id);
-        logger.debug("Get Patient with id - {}", id);
+        if (patient != null) {
+            logger.debug("Get Patient with id - {}", id);
+        } else {
+            logger.debug("Patient with id - {} was not found", id);
+        }
         return patient;
     }
 
     @Override
     public Patient save(Patient patient) {
         Patient newPatient = repository.save(patient);
-        logger.debug("Save new Patient with parameters - {}", newPatient);
+        if (newPatient != null) {
+            logger.debug("Save new Patient with parameters - {}", newPatient);
+        } else {
+            logger.debug("Patient with parameters - {} was not saved", patient);
+        }
         return newPatient;
     }
 

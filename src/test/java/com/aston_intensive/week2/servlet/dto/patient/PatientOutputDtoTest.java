@@ -53,5 +53,9 @@ class PatientOutputDtoTest {
         Set<DoctorOutputDto> dtoSet = Set.of(new DoctorOutputDto(1, "Name", new HospitalOutputDto(1, "Name", "Address")));
         dto.setDoctors(dtoSet);
         assertNotNull(dto.getDoctors());
+
+        Set<DoctorOutputDto> dtoSet1 = Set.of(new DoctorOutputDto(2, "Name", new HospitalOutputDto(1, "Name", "Address")));
+        dto.setDoctors(dtoSet1);
+        assertNotNull(dto.getDoctors());
     }
 }
