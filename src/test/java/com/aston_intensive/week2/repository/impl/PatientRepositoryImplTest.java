@@ -39,11 +39,22 @@ class PatientRepositoryImplTest extends PostgreSQLContainersTest {
         patientRepository.update(2, patient);
 
         assertEquals(patient.getName(), patientRepository.findById(2).getName());
+        assertThrows(NullPointerException.class, () -> patientRepository.update(1, null));
+    }
+
+    @Test
+    void executeSave() {
+        patientRepository.deleteById(1);
+        Patient patient = new Patient("Name", 10, "Address");
+
+        assertNotNull(patientRepository.save(patient));
+        assertThrows(NullPointerException.class, () -> patientRepository.save(null));
     }
 
     @Test
     void delete() {
         assertTrue(patientRepository.deleteById(7));
+        assertFalse(patientRepository.deleteById(500));
     }
 
     @Test
@@ -65,11 +76,12 @@ class PatientRepositoryImplTest extends PostgreSQLContainersTest {
 
         assertEquals(patient.getName(), patient1.getName());
         assertEquals(patient.getId(), patient1.getId());
+        assertThrows(NullPointerException.class, () -> patientRepository.mapObject(null));
     }
 
     @Test
     void findAllByDoctorId() {
-        assertEquals(3, patientRepository.findAllByDoctorId(2).size());
+        assertEquals(2, patientRepository.findAllByDoctorId(2).size());
     }
 
     @Test

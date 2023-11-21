@@ -14,11 +14,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -101,6 +99,17 @@ class AbstractServletTest {
         verify(printWriter, times(1)).write(hospitalOutputDtoJson);
     }
 
+    @Test
+    void doGet_errors() throws ServletException, IOException {
+        when(request.getPathInfo()).thenReturn("hospitals/500");
+        when(service.findById(500)).thenReturn(null);
+        when(response.getWriter()).thenReturn(printWriter);
+
+        servlet.doGet(request, response);
+
+        verify(service, times(1)).findById(500);
+        verify(response, times(1)).getWriter();
+    }
 
     @Test
     void doPost() throws IOException, ServletException {
@@ -118,6 +127,32 @@ class AbstractServletTest {
         verify(service, times(1)).save(any());
         verify(response, times(1)).setStatus(HttpServletResponse.SC_CREATED);
     }
+
+    @Test
+    void doPost_errors_path() throws IOException, ServletException {
+        when(request.getPathInfo()).thenReturn("hospitals/1");
+
+        servlet.doPost(request, response);
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+    @Test
+    void doPost_errors_entity() throws IOException, ServletException {
+        HospitalInputDto inputDto = new HospitalInputDto("Name", "Address");
+        Hospital hospital = new Hospital("Name", "Address");
+
+        when(request.getPathInfo()).thenReturn(null);
+        when(request.getParameter("name")).thenReturn(inputDto.getName());
+        when(request.getParameter("address")).thenReturn(inputDto.getAddress());
+        when(request.getReader()).thenReturn(new BufferedReader(new StringReader(new ObjectMapper().writeValueAsString(inputDto))));
+        when(service.findById(anyInt())).thenReturn(null);
+        when(service.save(hospital)).thenReturn(null);
+
+        servlet.doPost(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+
 
     @Test
     void doPut() throws IOException, ServletException {

@@ -14,8 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class HospitalRepositoryTest extends PostgreSQLContainersTest {
@@ -42,11 +41,22 @@ class HospitalRepositoryTest extends PostgreSQLContainersTest {
         hospitalRepository.update(2, hospital);
 
         assertEquals(hospital.getName(), hospitalRepository.findById(2).getName());
+        assertThrows(NullPointerException.class, () -> hospitalRepository.update(1, null));
+    }
+
+    @Test
+    void executeSave() {
+        hospitalRepository.deleteById(1);
+
+        Hospital hospital = new Hospital("Name", "Address");
+        assertNotNull(hospitalRepository.save(hospital));
+        assertThrows(NullPointerException.class, () -> hospitalRepository.save(null));
     }
 
     @Test
     void delete() {
         assertTrue(hospitalRepository.deleteById(3));
+        assertFalse(hospitalRepository.deleteById(500));
     }
 
     @Test
@@ -67,5 +77,6 @@ class HospitalRepositoryTest extends PostgreSQLContainersTest {
 
         assertEquals(hospital.getName(), hospital1.getName());
         assertEquals(hospital.getId(), hospital1.getId());
+        assertThrows(NullPointerException.class, () -> hospitalRepository.mapObject(null));
     }
 }
