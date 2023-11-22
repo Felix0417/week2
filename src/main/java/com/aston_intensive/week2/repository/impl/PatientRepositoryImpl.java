@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> implements PatientRepository {
@@ -34,14 +35,14 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
     }
 
     @Override
-    public Patient findById(Integer id) {
+    public Optional<Patient> findById(Integer id) {
         List<Patient> list = getListResults(FIND_BY_ID, id);
         if (list.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
         Patient patient = list.get(0);
         patient.setDoctors(getDoctors(id));
-        return patient;
+        return Optional.of(patient);
     }
 
     public Set<Patient> findAllByDoctorId(Integer doctorId) {
@@ -49,22 +50,20 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
     }
 
     @Override
-    public Patient save(Patient patient) {
+    public Optional<Patient> save(Patient patient) {
         try {
             return executeUpdate(INSERT, patient.getName(), patient.getAge(), patient.getAddress());
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Patient update(int pos, Patient patient) {
+    public Optional<Patient> update(int pos, Patient patient) {
         try {
             return executeUpdate(UPDATE, patient.getName(), patient.getAge(), patient.getAddress(), pos);
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -73,16 +72,15 @@ public class PatientRepositoryImpl extends AbstractRepositoryImpl<Patient> imple
         return delete(DELETE, id);
     }
 
-    protected Patient mapObject(ResultSet resultSet) {
+    protected Optional<Patient> mapObject(ResultSet resultSet) {
         try {
             int id = resultSet.getInt("id");
             String name = resultSet.getString("name");
             int age = resultSet.getInt("age");
             String address = resultSet.getString("address");
-            return new Patient(id, name, age, address);
+            return Optional.of(new Patient(id, name, age, address));
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 

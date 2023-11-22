@@ -5,6 +5,7 @@ import com.aston_intensive.week2.db.ConnectionManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class AbstractRepositoryImpl<T> {
     protected final ConnectionManager connectionManager;
@@ -23,7 +24,8 @@ public abstract class AbstractRepositoryImpl<T> {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<T> list = new ArrayList<>();
             while (resultSet.next()) {
-                list.add(mapObject(resultSet));
+                Optional<T> t = mapObject(resultSet);
+                t.ifPresent(list::add);
             }
             return list;
         } catch (SQLException e) {
@@ -31,7 +33,7 @@ public abstract class AbstractRepositoryImpl<T> {
         }
     }
 
-    protected T executeUpdate(String query, Object... params) throws SQLException {
+    protected Optional<T> executeUpdate(String query, Object... params) throws SQLException {
         try (Connection connection = connectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             int i = 1;
@@ -61,5 +63,5 @@ public abstract class AbstractRepositoryImpl<T> {
         }
     }
 
-    protected abstract T mapObject(ResultSet resultSet) throws SQLException;
+    protected abstract Optional<T> mapObject(ResultSet resultSet) throws SQLException;
 }

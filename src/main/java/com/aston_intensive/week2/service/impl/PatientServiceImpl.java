@@ -28,7 +28,7 @@ public class PatientServiceImpl implements Service<Patient> {
 
     @Override
     public Patient findById(int id) {
-        Patient patient = repository.findById(id);
+        Patient patient = repository.findById(id).orElse(null);
         if (patient != null) {
             logger.debug("Get Patient with id - {}", id);
         } else {
@@ -39,7 +39,7 @@ public class PatientServiceImpl implements Service<Patient> {
 
     @Override
     public Patient save(Patient patient) {
-        Patient newPatient = repository.save(patient);
+        Patient newPatient = repository.save(patient).orElse(null);
         if (newPatient != null) {
             logger.debug("Save new Patient with parameters - {}", newPatient);
         } else {
@@ -54,7 +54,7 @@ public class PatientServiceImpl implements Service<Patient> {
             logger.debug("Patient with this id - {} was not found", pos);
             return null;
         }
-        Patient updatePatient = repository.update(pos, patient);
+        Patient updatePatient = repository.update(pos, patient).orElse(null);
         logger.debug("Hospital with this id - {} was updated", pos);
         return updatePatient;
     }

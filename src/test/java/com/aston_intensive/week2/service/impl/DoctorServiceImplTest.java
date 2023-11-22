@@ -11,10 +11,12 @@ import org.mockito.MockitoAnnotations;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 class DoctorServiceImplTest {
@@ -28,7 +30,7 @@ class DoctorServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        service = new DoctorServiceImpl(mock(DoctorRepositoryImpl.class));
+        service = new DoctorServiceImpl(repository);
     }
 
     @Test
@@ -44,7 +46,7 @@ class DoctorServiceImplTest {
     @Test
     void service_findById() {
         Doctor doctor = new Doctor(1, "Smith", 50000, new Hospital());
-        when(service.findById(1)).thenReturn(doctor);
+        when(service.findById(1)).thenAnswer(invocation -> Optional.of(doctor));
 
         assertEquals(doctor, service.findById(1));
         assertNull(service.findById(500));
@@ -54,7 +56,7 @@ class DoctorServiceImplTest {
     void service_save() {
         Doctor doctor = new Doctor("Smith", 50000, new Hospital());
         Doctor savedDoctor = new Doctor(1, "Smith", 50000, new Hospital());
-        when(service.save(doctor)).thenReturn(savedDoctor);
+        when(service.save(doctor)).thenAnswer(invocation -> Optional.of(savedDoctor));
 
         assertEquals(savedDoctor, service.save(doctor));
         assertNull(service.save(null));
@@ -65,11 +67,10 @@ class DoctorServiceImplTest {
         Doctor doctor = new Doctor("Smith", 50000, new Hospital(1, "Name", "Address", LocalDateTime.MIN));
         Doctor updatedDoctor = new Doctor(1, "Smith", 50000, new Hospital(1, "Name", "Address", LocalDateTime.MIN));
 
-        when(service.findById(1)).thenReturn(doctor);
-        when(service.findById(2)).thenReturn(null);
-        when(service.findById(2)).thenReturn(doctor);
-        when(service.update(1, doctor)).thenReturn(updatedDoctor);
-        when(service.update(3, null)).thenReturn(null);
+        when(service.findById(1)).thenAnswer(invocation -> Optional.of(doctor));
+        when(service.findById(2)).thenAnswer(invocation -> Optional.empty());
+        when(service.update(1, doctor)).thenAnswer(invocation -> Optional.of(updatedDoctor));
+        when(service.update(3, null)).thenAnswer(invocation -> Optional.empty());
 
         assertEquals(updatedDoctor, service.update(1, doctor));
         assertNull(service.update(2, doctor));
@@ -101,8 +102,8 @@ class DoctorServiceImplTest {
     @Test
     void repository_findById() {
         Doctor doctor = new Doctor(1, "Smith", 50000, new Hospital());
-        when(repository.findById(1)).thenReturn(doctor);
-        Doctor actual = repository.findById(1);
+        when(repository.findById(1)).thenAnswer(invocation -> Optional.of(doctor));
+        Doctor actual = repository.findById(1).get();
         assertEquals(doctor, actual);
         verify(repository, times(1)).findById(1);
     }
@@ -111,8 +112,8 @@ class DoctorServiceImplTest {
     void repository_save() {
         Doctor doctor = new Doctor(1, "Smith", 50000, new Hospital());
         Doctor forSave = new Doctor("Smith", 50000, new Hospital());
-        when(repository.save(forSave)).thenReturn(doctor);
-        assertEquals(doctor, repository.save(forSave));
+        when(repository.save(forSave)).thenReturn(Optional.of(doctor));
+        assertEquals(doctor, repository.save(forSave).get());
         verify(repository, times(1)).save(forSave);
     }
 
@@ -120,9 +121,9 @@ class DoctorServiceImplTest {
     void repository_update() {
         Doctor doctor = new Doctor(1, "Smith", 50000, new Hospital());
         Doctor forUpdate = new Doctor("Smith", 50000, new Hospital());
-        when(repository.update(1, forUpdate)).thenReturn(doctor);
+        when(repository.update(1, forUpdate)).thenReturn(Optional.of(doctor));
         when(repository.update(2, forUpdate)).thenReturn(null);
-        assertEquals(doctor, repository.update(1, forUpdate));
+        assertEquals(doctor, repository.update(1, forUpdate).get());
         assertNull(repository.update(2, forUpdate));
         verify(repository, times(1)).update(2, forUpdate);
     }

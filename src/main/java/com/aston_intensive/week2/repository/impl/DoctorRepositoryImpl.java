@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> implements DoctorRepository {
@@ -36,33 +37,31 @@ public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> impleme
     }
 
     @Override
-    public Doctor findById(Integer id) {
+    public Optional<Doctor> findById(Integer id) {
         List<Doctor> doctors = getListResults(FIND_BY_ID, id);
         if (doctors.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
         Doctor doctor = doctors.get(0);
         doctor.setPatients(getPatients(doctor.getId()));
-        return doctor;
+        return Optional.of(doctor);
     }
 
     @Override
-    public Doctor save(Doctor doctor) {
+    public Optional<Doctor> save(Doctor doctor) {
         try {
             return executeUpdate(INSERT, doctor.getName(), doctor.getSalary(), doctor.getHospital().getId());
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Doctor update(int pos, Doctor doctor) {
+    public Optional<Doctor> update(int pos, Doctor doctor) {
         try {
             return executeUpdate(UPDATE, doctor.getName(), doctor.getSalary(), doctor.getHospital().getId(), pos);
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -75,17 +74,16 @@ public class DoctorRepositoryImpl extends AbstractRepositoryImpl<Doctor> impleme
         return new HashSet<>(getListResults(FIND_ALL_BY_PATIENT_ID, patientId));
     }
 
-    protected Doctor mapObject(ResultSet resultSet) {
+    protected Optional<Doctor> mapObject(ResultSet resultSet) {
         try {
             int id = resultSet.getInt("id");
             String name = resultSet.getString("name");
             int salary = resultSet.getInt("salary");
             int hospitalId = resultSet.getInt("hospital_id");
-            Hospital hospital = new HospitalRepositoryImpl(connectionManager).findById(hospitalId);
-            return new Doctor(id, name, salary, hospital);
+            Optional<Hospital> hospital = new HospitalRepositoryImpl(connectionManager).findById(hospitalId);
+            return Optional.of(new Doctor(id, name, salary, hospital.orElse(null)));
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 

@@ -1,16 +1,17 @@
 package com.aston_intensive.week2.repository.rep;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface Repository<T, K> {
 
     List<T> findAll();
 
-    T findById(K id);
+    Optional<T> findById(K id);
 
-    T save(T t);
+    Optional<T> save(T t);
 
-    T update(int pos, T t);
+    Optional<T> update(int pos, T t);
 
     boolean deleteById(K id);
 }

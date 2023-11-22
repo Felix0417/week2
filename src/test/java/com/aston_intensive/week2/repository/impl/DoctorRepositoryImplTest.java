@@ -37,16 +37,17 @@ class DoctorRepositoryImplTest extends PostgreSQLContainersTest {
 
     @Test
     void get_null_Result() {
-        assertNull(doctorRepository.findById(500));
+        assertFalse(doctorRepository.findById(500).isPresent());
     }
 
     @Test
     void executeUpdate() {
-        Doctor doctor = doctorRepository.findById(2);
+        Doctor doctor = doctorRepository.findById(2).orElse(null);
+        assert doctor != null;
         doctor.setName("Vasya");
         doctorRepository.update(2, doctor);
 
-        assertEquals(doctor.getName(), doctorRepository.findById(2).getName());
+        assertEquals(doctor.getName(), doctorRepository.findById(2).get().getName());
         assertThrows(NullPointerException.class, () -> doctorRepository.update(1, null));
     }
 
@@ -66,7 +67,7 @@ class DoctorRepositoryImplTest extends PostgreSQLContainersTest {
 
     @Test
     void mapObject() throws SQLException {
-        Doctor doctor = doctorRepository.findById(2);
+        Doctor doctor = doctorRepository.findById(2).orElse(null);
         String query = "UPDATE doctors SET name = ?, salary = ? WHERE id = ?";
         PreparedStatement statement = doctorRepository.connectionManager.getConnection()
                 .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -79,8 +80,9 @@ class DoctorRepositoryImplTest extends PostgreSQLContainersTest {
         ResultSet resultSet = statement.getGeneratedKeys();
         resultSet.next();
 
-        Doctor doctor1 = doctorRepository.mapObject(resultSet);
+        Doctor doctor1 = doctorRepository.mapObject(resultSet).orElse(null);
 
+        assert doctor1 != null;
         assertEquals(doctor.getName(), doctor1.getName());
         assertEquals(doctor.getId(), doctor1.getId());
     }

@@ -36,11 +36,12 @@ class HospitalRepositoryTest extends PostgreSQLContainersTest {
 
     @Test
     void executeUpdate() {
-        Hospital hospital = hospitalRepository.findById(2);
+        Hospital hospital = hospitalRepository.findById(2).orElse(null);
+        assert hospital != null;
         hospital.setName("Vasya");
         hospitalRepository.update(2, hospital);
 
-        assertEquals(hospital.getName(), hospitalRepository.findById(2).getName());
+        assertEquals(hospital.getName(), hospitalRepository.findById(2).get().getName());
         assertThrows(NullPointerException.class, () -> hospitalRepository.update(1, null));
     }
 
@@ -61,7 +62,7 @@ class HospitalRepositoryTest extends PostgreSQLContainersTest {
 
     @Test
     void mapObject() throws SQLException {
-        Hospital hospital = hospitalRepository.findById(2);
+        Hospital hospital = hospitalRepository.findById(2).orElse(null);
         String query = "UPDATE hospitals SET name = ?, address = ? WHERE id = ?";
         PreparedStatement statement = hospitalRepository.connectionManager.getConnection()
                 .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -73,8 +74,9 @@ class HospitalRepositoryTest extends PostgreSQLContainersTest {
         ResultSet resultSet = statement.getGeneratedKeys();
         resultSet.next();
 
-        Hospital hospital1 = hospitalRepository.mapObject(resultSet);
+        Hospital hospital1 = hospitalRepository.mapObject(resultSet).orElse(null);
 
+        assert hospital1 != null;
         assertEquals(hospital.getName(), hospital1.getName());
         assertEquals(hospital.getId(), hospital1.getId());
         assertThrows(NullPointerException.class, () -> hospitalRepository.mapObject(null));

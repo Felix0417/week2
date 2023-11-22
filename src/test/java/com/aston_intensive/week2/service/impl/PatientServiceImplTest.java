@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -43,8 +44,8 @@ class PatientServiceImplTest {
     void service_findById() {
         Patient patient = new Patient(1, "Name 1", 10, "address 1");
 
-        when(service.findById(1)).thenReturn(patient);
-        when(service.findById(2)).thenReturn(null);
+        when(service.findById(1)).thenAnswer(invocation -> Optional.of(patient));
+        when(service.findById(2)).thenAnswer(invocation -> Optional.empty());
 
         assertEquals(patient, service.findById(1));
         assertNull(service.findById(2));
@@ -55,8 +56,8 @@ class PatientServiceImplTest {
         Patient patient = new Patient(1, "Name 1", 10, "address 1");
         Patient savedPatient = new Patient("Name 1", 10, "address 1");
 
-        when(service.save(patient)).thenReturn(savedPatient);
-        when(service.save(null)).thenReturn(null);
+        when(service.save(patient)).thenAnswer(invocation -> Optional.of(savedPatient));
+        when(service.save(null)).thenAnswer(invocation -> Optional.empty());
 
         assertEquals(savedPatient, service.save(patient));
         assertNull(service.save(null));
@@ -67,11 +68,11 @@ class PatientServiceImplTest {
         Patient patient = new Patient(1, "Name 1", 10, "address 1");
         Patient updatedPatient = new Patient("Name 1", 10, "address 1");
 
-        when(service.findById(1)).thenReturn(patient);
-        when(service.findById(2)).thenReturn(null);
-        when(service.findById(2)).thenReturn(patient);
-        when(service.update(1, patient)).thenReturn(updatedPatient);
-        when(service.update(3, null)).thenReturn(null);
+        when(service.findById(1)).thenAnswer(invocation -> Optional.of(patient));
+        when(service.findById(2)).thenAnswer(invocation -> Optional.empty());
+        when(service.findById(2)).thenAnswer(invocation -> Optional.of(patient));
+        when(service.update(1, patient)).thenAnswer(invocation -> Optional.of(updatedPatient));
+        when(service.update(3, null)).thenAnswer(invocation -> Optional.empty());
 
         assertEquals(updatedPatient, service.update(1, patient));
         assertNull(service.update(2, patient));
@@ -101,10 +102,10 @@ class PatientServiceImplTest {
     @Test
     void repository_findById() {
         Patient patient = new Patient(1, "Name 1", 10, "address 1");
-        when(repository.findById(1)).thenReturn(patient);
-        when(repository.findById(2)).thenReturn(null);
-        assertEquals(patient, repository.findById(1));
-        assertNull(repository.findById(2));
+        when(repository.findById(1)).thenReturn(Optional.of(patient));
+        when(repository.findById(2)).thenReturn(Optional.empty());
+        assertEquals(patient, repository.findById(1).get());
+        assertFalse(repository.findById(2).isPresent());
         verify(repository, times(2)).findById(any());
 
     }
@@ -113,8 +114,8 @@ class PatientServiceImplTest {
     void repository_save() {
         Patient patient = new Patient(1, "Name 1", 10, "address 1");
         Patient forSave = new Patient("Name 1", 10, "address 1");
-        when(repository.save(forSave)).thenReturn(patient);
-        assertEquals(patient, repository.save(forSave));
+        when(repository.save(forSave)).thenReturn(Optional.of(patient));
+        assertEquals(patient, repository.save(forSave).get());
         verify(repository, times(1)).save(forSave);
     }
 
@@ -122,10 +123,10 @@ class PatientServiceImplTest {
     void repository_update() {
         Patient patient = new Patient(1, "Name 1", 10, "address 1");
         Patient forUpdate = new Patient("Name 1", 10, "address 1");
-        when(repository.update(1, forUpdate)).thenReturn(patient);
-        when(repository.update(2, forUpdate)).thenReturn(null);
-        assertEquals(patient, repository.update(1, forUpdate));
-        assertNull(repository.update(2, forUpdate));
+        when(repository.update(1, forUpdate)).thenReturn(Optional.of(patient));
+        when(repository.update(2, forUpdate)).thenReturn(Optional.empty());
+        assertEquals(patient, repository.update(1, forUpdate).get());
+        assertFalse(repository.update(2, forUpdate).isPresent());
         verify(repository, times(1)).update(1, forUpdate);
     }
 

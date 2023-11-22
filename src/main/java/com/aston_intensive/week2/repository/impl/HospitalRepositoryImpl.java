@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public class HospitalRepositoryImpl extends AbstractRepositoryImpl<Hospital> implements HospitalRepository {
 
@@ -31,28 +32,30 @@ public class HospitalRepositoryImpl extends AbstractRepositoryImpl<Hospital> imp
     }
 
     @Override
-    public Hospital findById(Integer id) {
+    public Optional<Hospital> findById(Integer id) {
         List<Hospital> list = getListResults(FIND_BY_ID, id);
-        return list.isEmpty() ? null : list.get(0);
+        if (list.isEmpty()) {
+            return Optional.empty();
+        }
+        Hospital hospital = list.get(0);
+        return Optional.of(hospital);
     }
 
     @Override
-    public Hospital save(Hospital hospital) {
+    public Optional<Hospital> save(Hospital hospital) {
         try {
             return executeUpdate(INSERT, hospital.getName(), hospital.getAddress());
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Hospital update(int pos, Hospital hospital) {
+    public Optional<Hospital> update(int pos, Hospital hospital) {
         try {
             return executeUpdate(UPDATE, hospital.getName(), hospital.getAddress(), pos);
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -61,17 +64,16 @@ public class HospitalRepositoryImpl extends AbstractRepositoryImpl<Hospital> imp
         return delete(DELETE, id);
     }
 
-    protected Hospital mapObject(ResultSet resultSet) {
+    protected Optional<Hospital> mapObject(ResultSet resultSet) {
         try {
             int id = resultSet.getInt("id");
             String name = resultSet.getString("name");
             String address = resultSet.getString("address");
             Timestamp timestamp = resultSet.getTimestamp("estimated");
             LocalDateTime estimated = timestamp == null ? null : timestamp.toLocalDateTime();
-            return new Hospital(id, name, address, estimated);
+            return Optional.of(new Hospital(id, name, address, estimated));
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 }
